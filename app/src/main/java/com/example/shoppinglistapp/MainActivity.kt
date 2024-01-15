@@ -32,23 +32,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top
-                    )
-                    {
-                        val hey = LocalContext.current
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick =
-                        { Toast.makeText(hey,
-                            " You added item successfully!",
-                            Toast.LENGTH_SHORT).show() },
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        {
-                            Text(text = "Add item")
-                        }
-                    }
+                    ShoppingList()
                 }
             }
         }
