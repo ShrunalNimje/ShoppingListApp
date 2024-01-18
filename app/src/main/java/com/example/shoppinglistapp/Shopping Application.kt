@@ -33,9 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.util.UUID
 
 data class ShoppingClass(
-    var id : Int,
+    var id : UUID,
     var item : String,
     var quantity : Int,
     var isEditable: Boolean = false
@@ -69,9 +70,29 @@ fun ShoppingList() {
         )
         {
             items(stateItem){
-                ShoppingListItem(item = it,
-                    onEditClick = {},
-                    onDeleteClick = {})
+                    items ->
+                if (items.isEditable){
+                    ShoppingItemEditor(item = items,
+                        onEditComplete = {
+                                editedName, editedQuantity ->
+                            stateItem.map { it.copy(isEditable = false) }
+                            stateItem = stateItem.map { it.copy(isEditable = false) }
+                            val editedItem = stateItem.find { it.id == items.id }
+                            editedItem?.let {
+                                it.item = editedName
+                                it.quantity = editedQuantity
+                            }
+                        }
+                    )
+                }
+                else{
+                    ShoppingListItem(item = items,
+                        onEditClick = {
+                            stateItem = stateItem.map {it.copy(isEditable = it.id == items.id)} },
+                        onDeleteClick = {
+                            stateItem = stateItem - items}
+                    )
+                }
             }
         }
     }
@@ -90,7 +111,7 @@ fun ShoppingList() {
                     Button(onClick = {
                         if (itemName.isNotBlank()){
                             val itemList = ShoppingClass(
-                                id = stateItem.size+1,
+                                id = UUID.randomUUID(),
                                 item = itemName,
                                 quantity = itemQuantity.toInt()
                             )
@@ -147,7 +168,8 @@ fun ShoppingListItem(
             .border(
                 border = BorderStroke(2.dp, color = Color(0xFFD0BCFF)),
                 shape = RoundedCornerShape(20)
-            )
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = item.item, modifier = Modifier.padding(16.dp))
         Text(text = item.quantity.toString(), modifier = Modifier.padding(16.dp))
@@ -155,13 +177,13 @@ fun ShoppingListItem(
         Row(
             modifier = Modifier.padding(8.dp),
         ) {
-            IconButton(onClick = { onEditClick })
+            IconButton(onClick = onEditClick )
             {
                 Icon(imageVector =Icons.Default.Edit ,
                     contentDescription = "Edit Button")
             }
 
-            IconButton(onClick = { onDeleteClick })
+            IconButton(onClick = onDeleteClick )
             {
                 Icon(imageVector = Icons.Default.Delete ,
                     contentDescription = "Delete Button")
